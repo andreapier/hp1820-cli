@@ -352,18 +352,32 @@ class Cli:
         self._httpPost('set_port_status', post_data)
 
     def setPoeStatus(self, interface, status):
+        config = {
+            'admin_mode_sel': status,
+            'schedule_sel': 'none',
+            'priority_sel': 'low',
+            'high_power_mode_sel': 'disable',
+            'power_detect_type_sel': '4pt_dot3af',
+            'power_limit_type_sel': 'dot3af',
+            'power_limit': '',
+            'interface': interface,
+        }
+        self.setPoeStatusExtended(config)
+
+    def setPoeStatusExtended(self, config):
+        print("setPoeStatusExtended: " + str(config))
         post_data = {
-            'admin_mode_sel[]': status,               # enabled, disabled
-            'schedule_sel[]': 'none',                 # none, 1, 2
-            'priority_sel[]': 'low',                  # critical, high, low
-            'high_power_mode_sel[]': 'disable',       # dot3at, disable
-            'power_detect_type_sel[]': '4pt_dot3af',  # 4pt_dot3af, 4pt_dot3af_leg
-            'power_limit_type_sel[]': 'dot3af',       # dot3af, user
-            'power_limit': '',                        # 3-15.4
-            'intfStr': interface,
+            'admin_mode_sel[]': config['admin_mode_sel'],               # enabled, disabled
+            'schedule_sel[]': config['schedule_sel'],                   # none, 1, 2
+            'priority_sel[]': config['priority_sel'],                   # critical, high, low
+            'high_power_mode_sel[]': config['high_power_mode_sel'],     # dot3at, disable
+            'power_detect_type_sel[]': config['power_detect_type_sel'], # 4pt_dot3af, 4pt_dot3af_leg
+            'power_limit_type_sel[]': config['power_limit_type_sel'],   # dot3af, user
+            'power_limit': config['power_limit'],                       # 3-15.4
+            'intfStr': config['interface'],                             # 1-12
             'b_modal1_clicked': 'b_modal1_submit'
         }
-        self._httpPost('set_port_status', post_data)
+        self._httpPost('set_poe_status', post_data)
 
     def setPortChannel(self, channel_id, interface_id_str, admin_mode, stp_mode, static_mode, clear = False):
         interface_ids = parseIds(interface_id_str)

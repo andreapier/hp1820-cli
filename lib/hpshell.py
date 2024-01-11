@@ -167,7 +167,21 @@ class Prompt(Cmd):
         mode = input("enable or disable POE on a port (e/d)?")
         while mode not in available_mode:
             mode = input("enable or disable POE on a port (e/d)?")
-        cli.setPoeStatus(input("Interfaces(1-12)?"), available_mode[mode])
+        config = {
+            'admin_mode_sel': available_mode[mode],
+            'schedule_sel': 'none',
+            'priority_sel': 'low',
+            'high_power_mode_sel': 'disable',
+            'power_detect_type_sel': '4pt_dot3af',
+            'power_limit_type_sel': 'dot3af',
+            'power_limit': '',
+            'interface': input("Interfaces(1-12)?"),
+        }
+        self.do_setpoestatus_extended(config)
+
+    def do_setpoestatus_extended(self, config):
+        """Enable or disable POE."""
+        cli.setPoeStatusExtended(config)
 
     def do_ping(self, args):
         """Ping an IP through the switch"""

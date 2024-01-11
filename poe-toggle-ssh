@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import sys
+
+from lib.cli import Cli
+
+def checkArgument():
+    if len(sys.argv) != 6:
+        print("http - Connect a switch through HTTP protocol")
+        print("Usage: poe-toggle-ssh host user password port status")
+        print("       port must be a number between 1 and 12")
+        print("       status must be either \"enabled\" to enable POE or \"disabled\" to disable it")
+        sys.exit(0)
+
+def parseArgument():
+    return sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
+
+if __name__ == "__main__":
+    checkArgument()
+    host, user, password, port, status = parseArgument()
+
+    if Cli.testConnection('https', host):
+        cli = Cli('https', host)
+    else:
+        if Cli.testConnection('http', host):
+            cli = Cli('http', host)
+        else:
+            print("Error: Cannot connect to remote host through HTTP and HTTPS.")
+            sys.exit(0)
+
+    if not cli.login(user, password):
+        print("Cannot login. Username or password are wrong")
+        sys.exit(0)
+
+    try:
+        config = {
+            'admin_mode_sel': status,
+            'schedule_sel': 'none',
+            'priority_sel': 'low',
+            'high_power_mode_sel': 'disable',
+            'power_detect_type_sel': '4pt_dot3af',
+            'power_limit_type_sel': 'dot3af',
+            'power_limit': '',
+            'interface': port,
+        }
+        cli.setPoeStatusExtended(config)
+    except Exception as e:
+        print("An error occured: " + str(e))
+    finally:
+        cli.logout()
+        cli.close()
