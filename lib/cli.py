@@ -86,10 +86,10 @@ class Cli:
         #first_row = ['Interface', 'Admin Mode', 'Priority', 'Schedule', 'High Power Mode', 'Power Detect Type', 'Power Limit Type', 'Status', 'Fault Status']
         rows = parseStatus(self._httpGet('poe_status'), True)
         if ports==[]:
-            return {x[0]:x[2] for x in rows}
+            return {x[0]:x[1] for x in rows}
         else:
             filtered_rows = [rows[i-1] for i in ports]
-            return {x[0]:x[2] for x in filtered_rows} # index 0 is port number, index 2 is enabled status
+            return {x[0]:x[1] for x in filtered_rows} # index 0 is port number, index 1 is enabled status
         
 
     # DEPRECATED: This method uses the same API as showDashboard()
