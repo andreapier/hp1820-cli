@@ -82,6 +82,16 @@ class Cli:
     def showVlanMembership(self):
         printVlanMembership(self._httpGet('all_config'))
 
+    def getPoeStatus(self, ports=[]):
+        #first_row = ['Interface', 'Admin Mode', 'Priority', 'Schedule', 'High Power Mode', 'Power Detect Type', 'Power Limit Type', 'Status', 'Fault Status']
+        rows = parseStatus(self._httpGet('poe_status'), True)
+        if ports==[]:
+            return map(format_poe_status, rows)
+        else:
+            filtered_rows = [rows[i-1] for i in ports]
+            return {x[0]:x[7] for x in filtered_rows} # index 0 is port number, index 7 is POE status
+        
+        
     # DEPRECATED: This method uses the same API as showDashboard()
     def getSwitchName(self):
         raw_response = self._httpGet('dashboard')
@@ -501,7 +511,6 @@ class Cli:
                 self.probessent = probesent
                 self.seq = seq
 
-
 URLS = {
     'login': '/htdocs/login/login.lua',
     'logout': '/htdocs/pages/main/logout.lsp',
@@ -615,3 +624,6 @@ def printVlanMembership(raw_response):
         for row in table.find_all("tr"):
             data.append([col.get_text() for col in row.find_all("td")])
     printTable(first_row, data)
+
+def format_poe_status(row):
+    return {[row[0]]:row[7]}

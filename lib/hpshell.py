@@ -35,6 +35,10 @@ class Prompt(Cmd):
         """Show POE status."""
         cli.showPoeStatus()
 
+    def do_getpoe(self, args):
+        """Get POE status."""
+        cli.getPoeStatus()
+
     def do_showportchannel(self, args):
         """Show port channel information."""
         cli.showPortChannel()
